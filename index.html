@@ -1,31 +1,56 @@
 <style>
   @import url("https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap");
+
+  /* Latar belakang halaman diubah menjadi abu-abu muda agar HP putih terlihat menonjol */
+  body {
+    background-color: #e5e5e5;
+    margin: 0;
+  }
+
   #hp {
+    /* TEMA LIGHT (HITAM & PUTIH) */
+    --color-background-primary: #ffffff; /* Latar belakang layar ponsel (Putih) */
+    --color-text-primary: #000000; /* Teks utama, garis luar, dan tombol (Hitam) */
+    --color-text-secondary: #555555; /* Teks sekunder (Abu-abu gelap) */
+    --color-text-tertiary: #aaaaaa; /* Garis batas dalam layar (Abu-abu terang) */
+
+    --color-text-warning: #000000; /* Highlight titik helm yang terpilih (Hitam) */
+    --color-background-warning: #000000; /* Background daftar/tombol yang terpilih (Hitam) */
+
     font-family: "Kalam", "Comic Sans MS", cursive;
     display: flex;
     justify-content: center;
-    padding: 1rem 0;
+    padding: 2rem 0;
+    background-color: #e5e5e5; /* Samakan dengan warna body */
   }
+
   #hp * {
     font-family: "Kalam", "Comic Sans MS", cursive;
     box-sizing: border-box;
   }
+
+  /* BINGKAI LUAR PONSEL (Bezel) */
   .frame {
     width: 344px;
-    border: 2.5px solid var(--color-text-primary);
-    border-radius: 30px 28px 30px 29px;
+    border: 4px solid #000000; /* Garis pinggir luar HP hitam tegas */
+    border-radius: 40px;
     background: var(--color-background-primary);
-    padding: 8px;
+    padding: 10px;
     flex-shrink: 0;
   }
+
+  /* LAYAR PONSEL (Screen) */
   .scr {
     border: 1.5px solid var(--color-text-tertiary);
-    border-radius: 22px;
-    min-height: 560px;
+    border-radius: 30px;
+    height: 718px;
+    overflow: hidden;
     padding: 14px 14px 16px;
     display: flex;
     flex-direction: column;
+    color: var(--color-text-primary);
   }
+
   .h1 {
     font-size: 22px;
     font-weight: 700;
@@ -94,9 +119,6 @@
     cursor: pointer;
     margin-bottom: 7px;
   }
-  .tag.on {
-    background: var(--color-background-warning);
-  }
   .cbx {
     width: 16px;
     height: 16px;
@@ -119,6 +141,25 @@
   }
   .scrollarea {
     overflow-y: auto;
+  }
+
+  /* Aturan tambahan agar teks berubah menjadi putih jika background sedang menjadi hitam */
+  .tag.on,
+  [style*="var(--color-background-warning)"] {
+    background: var(--color-background-warning);
+    color: var(--color-background-primary) !important;
+  }
+
+  /* Desain Scrollbar disesuaikan untuk Light Theme */
+  .scrollarea::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scrollarea::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollarea::-webkit-scrollbar-thumb {
+    background: #cccccc;
+    border-radius: 4px;
   }
 </style>
 
