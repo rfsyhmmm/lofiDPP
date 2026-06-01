@@ -1,0 +1,459 @@
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap");
+  #hp {
+    font-family: "Kalam", "Comic Sans MS", cursive;
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+  }
+  #hp * {
+    font-family: "Kalam", "Comic Sans MS", cursive;
+    box-sizing: border-box;
+  }
+  .frame {
+    width: 344px;
+    border: 2.5px solid var(--color-text-primary);
+    border-radius: 30px 28px 30px 29px;
+    background: var(--color-background-primary);
+    padding: 8px;
+    flex-shrink: 0;
+  }
+  .scr {
+    border: 1.5px solid var(--color-text-tertiary);
+    border-radius: 22px;
+    min-height: 560px;
+    padding: 14px 14px 16px;
+    display: flex;
+    flex-direction: column;
+  }
+  .h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+  .h2 {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+  .bx {
+    border: 2px solid var(--color-text-primary);
+    background: transparent;
+  }
+  .btn {
+    border: 2px solid var(--color-text-primary);
+    border-radius: 13px 16px 12px 15px;
+    background: transparent;
+    color: var(--color-text-primary);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 9px;
+    width: 100%;
+    text-align: center;
+  }
+  .btn:active {
+    transform: scale(0.98);
+  }
+  .btnf {
+    background: var(--color-text-primary);
+    color: var(--color-background-primary);
+  }
+  .card {
+    border: 2px solid var(--color-text-primary);
+    border-radius: 15px 12px 16px 13px;
+    padding: 10px 12px;
+    cursor: pointer;
+    background: transparent;
+  }
+  .card:active {
+    transform: scale(0.99);
+  }
+  .navb {
+    border: 2px solid var(--color-text-primary);
+    border-radius: 9px 11px 8px 10px;
+    background: transparent;
+    color: var(--color-text-primary);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 6px 0;
+    width: 100%;
+  }
+  .navb.on {
+    background: var(--color-text-primary);
+    color: var(--color-background-primary);
+  }
+  .tag {
+    border: 2px solid var(--color-text-primary);
+    border-radius: 11px 9px 12px 10px;
+    padding: 7px 10px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+    margin-bottom: 7px;
+  }
+  .tag.on {
+    background: var(--color-background-warning);
+  }
+  .cbx {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--color-text-primary);
+    border-radius: 4px 3px 5px 3px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .fld {
+    border: 2px solid var(--color-text-primary);
+    border-radius: 11px 13px 10px 12px;
+    padding: 9px 11px;
+    font-size: 15px;
+    color: var(--color-text-tertiary);
+    margin-top: 5px;
+  }
+  .scrollarea {
+    overflow-y: auto;
+  }
+</style>
+
+<div id="hp">
+  <div class="frame"><div class="scr" id="hp-app"></div></div>
+</div>
+
+<script>
+  (function () {
+    const S = {
+      screen: "home",
+      name: "",
+      phone: "",
+      type: null,
+      view: "F",
+      tagged: new Set(),
+      eta: null,
+      code: null,
+      orders: [
+        { code: "D-0106-001", name: "Budi", type: "Full Face", status: "Proses", eta: "Hari ini 15:00" },
+        { code: "D-0106-002", name: "Sari", type: "Standar", status: "Selesai", eta: "Siap diambil" },
+      ],
+    };
+
+    const VIEWS = [
+      ["T", "Atas"],
+      ["BT", "Bawah"],
+      ["F", "Depan"],
+      ["BK", "Blkg"],
+      ["R", "Kanan"],
+      ["L", "Kiri"],
+    ];
+
+    const PARTS = {
+      STD: {
+        F: [
+          { id: "visor", label: "Visor / kaca", risk: "Retak, baret", comp: "Tidak ada — hardware" },
+          { id: "trim_f", label: "Karet list", risk: "Lepas / sobek", comp: "Pasang ulang" },
+          { id: "logo_f", label: "Logo depan", risk: "Terkelupas", comp: "Tidak ada" },
+        ],
+        T: [
+          { id: "topvent", label: "Top vent", risk: "Tersumbat / lepas", comp: "Bersihkan" },
+          { id: "shell_t", label: "Shell atas", risk: "Baret permukaan", comp: "Poles ringan" },
+        ],
+        BT: [
+          { id: "crown", label: "Crown pad", risk: "Sobek / lepas", comp: "Jahit ulang" },
+          { id: "cheek", label: "Cheek pad", risk: "Sobek / berbau", comp: "Cuci ulang gratis" },
+          { id: "neck", label: "Neck roll", risk: "Sobek / lepas", comp: "Jahit ulang" },
+          { id: "strap", label: "Chin strap", risk: "Sobek", comp: "Tidak ada" },
+        ],
+        BK: [
+          { id: "logo_b", label: "Logo belakang", risk: "Terkelupas", comp: "Tidak ada" },
+          { id: "shell_b", label: "Shell belakang", risk: "Baret", comp: "Poles ringan" },
+        ],
+        L: [
+          { id: "rachet_l", label: "Visor mount", risk: "Longgar / patah", comp: "Kencangkan" },
+          { id: "intercom", label: "Intercom (opsional)", risk: "Kena air → rusak", comp: "Lepas dulu — tidak ada" },
+        ],
+        R: [{ id: "rachet_r", label: "Visor mount", risk: "Longgar / patah", comp: "Kencangkan" }],
+      },
+      FF: {
+        F: [
+          { id: "visor", label: "Visor / kaca", risk: "Retak, baret", comp: "Tidak ada — hardware" },
+          { id: "chinbar", label: "Chin bar", risk: "Retak struktural", comp: "Tolak jika parah" },
+          { id: "chinvent", label: "Chin vent", risk: "Tersumbat / lepas", comp: "Bersihkan" },
+          { id: "nose", label: "Nose guard", risk: "Lepas / patah", comp: "Pasang ulang" },
+        ],
+        T: [
+          { id: "topvent", label: "Top vent", risk: "Tersumbat / lepas", comp: "Bersihkan" },
+          { id: "shell_t", label: "Shell atas", risk: "Baret permukaan", comp: "Poles ringan" },
+        ],
+        BT: [
+          { id: "crown", label: "Crown pad", risk: "Sobek / lepas", comp: "Jahit ulang" },
+          { id: "cheek", label: "Cheek pad", risk: "Sobek / berbau", comp: "Cuci ulang gratis" },
+          { id: "innerchin", label: "Inner chin guard", risk: "Sobek / lepas", comp: "Jahit ulang" },
+          { id: "curtain", label: "Chin curtain", risk: "Kotor parah", comp: "Cuci ulang gratis" },
+          { id: "strap", label: "Chin strap", risk: "Sobek", comp: "Tidak ada" },
+        ],
+        BK: [
+          { id: "extractor", label: "Air extractor", risk: "Tersumbat / lepas", comp: "Bersihkan" },
+          { id: "spoiler", label: "Air spoiler", risk: "Lepas / patah", comp: "Pasang ulang" },
+        ],
+        L: [
+          { id: "rachet_l", label: "Visor mount", risk: "Longgar / patah", comp: "Kencangkan" },
+          { id: "intercom", label: "Intercom (opsional)", risk: "Kena air → rusak", comp: "Lepas dulu — tidak ada" },
+        ],
+        R: [{ id: "rachet_r", label: "Visor mount", risk: "Longgar / patah", comp: "Kencangkan" }],
+      },
+    };
+
+    const HS = {
+      F: { visor: [110, 88], nose: [110, 118], chinvent: [140, 150], chinbar: [80, 166], logo_f: [110, 50], trim_f: [44, 140] },
+      T: { topvent: [110, 62], shell_t: [110, 140] },
+      BT: { crown: [110, 62], cheek: [62, 118], neck: [158, 118], innerchin: [110, 150], curtain: [90, 178], strap: [110, 190] },
+      BK: { extractor: [110, 88], spoiler: [110, 158], logo_b: [152, 112], shell_b: [68, 90] },
+      L: { rachet_l: [152, 96], shell_l: [92, 68], intercom: [58, 122] },
+      R: { rachet_r: [68, 96], shell_r: [128, 68] },
+    };
+
+    function dk() {
+      return S.type === "Standar" ? "STD" : "FF";
+    }
+
+    function helmetShape(view, ff) {
+      const ink = "var(--color-text-primary)";
+      const lite = "var(--color-text-tertiary)";
+      if (view === "F") {
+        let s = `<path d="M30,120 Q30,38 110,38 Q190,38 190,120 L190,150 Q190,166 174,170 L160,200 Q155,210 144,210 L76,210 Q65,210 60,200 L46,170 Q30,166 30,150 Z" fill="none" stroke="${ink}" stroke-width="2.5"/>`;
+        s += `<path d="M54,72 Q110,58 166,72 L160,108 Q110,98 60,108 Z" fill="none" stroke="${lite}" stroke-width="1.5"/>`;
+        if (ff) s += `<path d="M56,158 Q110,176 164,158" fill="none" stroke="${lite}" stroke-width="1.5"/>`;
+        return s;
+      }
+      if (view === "T")
+        return `<ellipse cx="110" cy="122" rx="74" ry="94" fill="none" stroke="${ink}" stroke-width="2.5"/><path d="M86,42 Q110,32 134,42" fill="none" stroke="${lite}" stroke-width="1.5"/><path d="M70,122 L150,122" stroke="${lite}" stroke-width="1" stroke-dasharray="4 4"/>`;
+      if (view === "BT") return `<ellipse cx="110" cy="122" rx="78" ry="94" fill="none" stroke="${ink}" stroke-width="2.5"/><ellipse cx="110" cy="124" rx="46" ry="60" fill="none" stroke="${lite}" stroke-width="1.5"/>`;
+      if (view === "BK") {
+        let s = `<path d="M30,120 Q30,38 110,38 Q190,38 190,120 L185,182 Q110,202 35,182 Z" fill="none" stroke="${ink}" stroke-width="2.5"/>`;
+        s += `<path d="M72,150 Q110,160 148,150 L143,166 Q110,174 77,166 Z" fill="none" stroke="${lite}" stroke-width="1.5"/>`;
+        return s;
+      }
+      const flip = view === "R" ? ' transform="translate(220,0) scale(-1,1)"' : "";
+      let s = `<g${flip}><path d="M35,112 Q35,46 110,46 Q186,46 186,112 Q186,152 158,168 L66,168 Q40,162 35,128 Z" fill="none" stroke="${ink}" stroke-width="2.5"/>`;
+      s += `<path d="M150,86 Q162,112 150,140" fill="none" stroke="${lite}" stroke-width="1.5"/></g>`;
+      return s;
+    }
+
+    function hotspot(id, x, y) {
+      const on = S.tagged.has(id);
+      let h = `<circle cx="${x}" cy="${y}" r="13" fill="${on ? "var(--color-text-warning)" : "var(--color-background-primary)"}" stroke="var(--color-text-primary)" stroke-width="2" style="cursor:pointer" onclick="HPtoggle('${id}')"/>`;
+      if (on) h += `<path d="M${x - 5},${y} l3,4 l6,-8" fill="none" stroke="var(--color-background-primary)" stroke-width="2" style="pointer-events:none"/>`;
+      else h += `<circle cx="${x}" cy="${y}" r="3" fill="var(--color-text-tertiary)" style="pointer-events:none"/>`;
+      return h;
+    }
+
+    function helmetSVG() {
+      const ff = dk() === "FF";
+      const parts = PARTS[dk()][S.view] || [];
+      const pos = HS[S.view] || {};
+      let hot = "";
+      parts.forEach((p) => {
+        if (pos[p.id]) hot += hotspot(p.id, pos[p.id][0], pos[p.id][1]);
+      });
+      return `<svg viewBox="0 0 220 230" width="100%" height="100%">${helmetShape(S.view, ff)}${hot}</svg>`;
+    }
+
+    function el() {
+      return document.getElementById("hp-app");
+    }
+
+    function render() {
+      const f = { home: rHome, id: rId, tipe: rTipe, inspeksi: rInsp, ringkasan: rRingk, estimasi: rEta, konfirm: rKon }[S.screen];
+      el().innerHTML = f();
+    }
+
+    function statusbar() {
+      return `<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--color-text-tertiary);margin-bottom:8px"><span>9:41</span><span>dthree</span><span>100%</span></div>`;
+    }
+
+    function rHome() {
+      const list = S.orders
+        .map(
+          (o) =>
+            `<div class="card" style="margin-bottom:9px" onclick="HPnoop()"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:16px;font-weight:700">${o.name}</span><span style="font-size:12px;border:1.5px solid var(--color-text-primary);border-radius:8px;padding:1px 7px">${o.status}</span></div><div style="font-size:13px;color:var(--color-text-secondary)">${o.code} · ${o.type}</div><div style="font-size:13px;color:var(--color-text-secondary)">${o.eta}</div></div>`,
+        )
+        .join("");
+      return (
+        statusbar() +
+        `<div class="h1">Dthree</div><div class="h2" style="margin-bottom:14px">Cuci helm &amp; sepatu</div>
+ <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:8px">Order aktif (${S.orders.length})</div>
+ <div class="scrollarea" style="flex:1">${list}</div>
+ <button class="btn btnf" style="margin-top:10px;font-size:18px" onclick="HPgo('id')">+ Order Baru</button>`
+      );
+    }
+
+    function rId() {
+      return (
+        statusbar() +
+        `<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><button class="btn" style="width:auto;padding:4px 12px" onclick="HPgo('home')">←</button><span class="h1">Order Baru</span></div>
+ <div style="font-size:15px;color:var(--color-text-secondary);margin-bottom:6px">Identifikasi pelanggan</div>
+ <div style="font-size:14px;margin-top:8px">Nama</div><div class="fld">ketik nama...</div>
+ <div style="font-size:14px;margin-top:14px">Nomor HP</div><div class="fld">08...</div>
+ <div style="font-size:13px;color:var(--color-text-tertiary);margin-top:14px;border:1.5px dashed var(--color-text-tertiary);border-radius:10px;padding:8px">Nomor ini dipakai untuk notifikasi saat helm selesai &amp; jadi titik mulai garansi 1 bulan.</div>
+ <div style="flex:1"></div>
+ <button class="btn btnf" style="font-size:18px" onclick="HPstartType()">Mulai →</button>`
+      );
+    }
+
+    function rTipe() {
+      const opt = (t, p, d) =>
+        `<div class="card" style="margin-bottom:11px" onclick="HPpickType('${t}')"><div style="display:flex;justify-content:space-between"><span style="font-size:18px;font-weight:700">${t}</span><span style="font-size:16px">Rp ${p}</span></div><div style="font-size:13px;color:var(--color-text-secondary)">${d}</div></div>`;
+      return (
+        statusbar() +
+        `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><button class="btn" style="width:auto;padding:4px 12px" onclick="HPgo('id')">←</button><span class="h1">Tipe Helm?</span></div>
+ <div class="h2" style="margin-bottom:16px">Pilih untuk muat aset 3D</div>
+ ${opt("Standar", "35.000", "Half face, tanpa chin bar")}
+ ${opt("Full Face", "45.000", "Lengkap dengan chin bar")}
+ ${opt("Premium", "55.000", "Full face + komponen ekstra")}
+ <div style="flex:1"></div>
+ <div style="font-size:12px;color:var(--color-text-tertiary);text-align:center">Aset 3D dimuat sesuai tipe</div>`
+      );
+    }
+
+    function navCol() {
+      return VIEWS.map((v) => `<button class="navb ${S.view === v[0] ? "on" : ""}" onclick="HPsetView('${v[0]}')">${v[0]}<div style="font-size:9px;font-weight:400">${v[1]}</div></button>`).join("");
+    }
+
+    function tagPanel() {
+      const parts = PARTS[dk()][S.view] || [];
+      return parts
+        .map((p) => {
+          const on = S.tagged.has(p.id);
+          return `<div class="tag ${on ? "on" : ""}" onclick="HPtoggle('${p.id}')"><span class="cbx">${on ? "✓" : ""}</span><span style="font-size:14px;flex:1">${p.label}</span></div>`;
+        })
+        .join("");
+    }
+
+    function rInsp() {
+      const n = S.tagged.size;
+      return (
+        statusbar() +
+        `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><div style="display:flex;align-items:center;gap:7px"><button class="btn" style="width:auto;padding:3px 10px" onclick="HPgo('tipe')">←</button><span style="font-size:18px;font-weight:700">Inspeksi</span></div><span style="font-size:13px;color:var(--color-text-secondary)">${S.type}</span></div>
+ <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:6px">Tap bagian yang rawan ↔ tag tercentang</div>
+ <div style="display:flex;gap:8px">
+   <div class="bx" style="flex:1;border-radius:16px 14px 17px 13px;height:200px" id="hp-svg">${helmetSVG()}</div>
+   <div style="width:54px;display:flex;flex-direction:column;gap:5px">${navCol()}</div>
+ </div>
+ <div style="font-size:13px;color:var(--color-text-secondary);margin:10px 0 6px">Bagian — view ${S.view} (${n} ditandai)</div>
+ <div class="scrollarea" style="flex:1;max-height:150px">${tagPanel()}</div>
+ <button class="btn btnf" style="font-size:18px;margin-top:8px" onclick="HPgo('ringkasan')">Next →</button>`
+      );
+    }
+
+    function allTagged() {
+      const out = [];
+      ["F", "T", "BT", "BK", "L", "R"].forEach((v) => {
+        (PARTS[dk()][v] || []).forEach((p) => {
+          if (S.tagged.has(p.id)) out.push(p);
+        });
+      });
+      return out;
+    }
+
+    function rRingk() {
+      const items = allTagged();
+      const body = items.length
+        ? items
+            .map(
+              (p) =>
+                `<div class="card" style="margin-bottom:9px;cursor:default"><div style="font-size:16px;font-weight:700">${p.label}</div><div style="font-size:13px;color:var(--color-text-secondary)">Risiko: ${p.risk}</div><div style="font-size:13px;color:var(--color-text-secondary)">Kompensasi: ${p.comp}</div></div>`,
+            )
+            .join("")
+        : `<div style="font-size:14px;color:var(--color-text-tertiary);text-align:center;padding:20px">Tidak ada bagian ditandai.<br>Helm dalam kondisi standar.</div>`;
+      return (
+        statusbar() +
+        `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><button class="btn" style="width:auto;padding:3px 10px" onclick="HPgo('inspeksi')">←</button><span class="h1" style="font-size:19px">Ringkasan Risiko</span></div>
+ <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:10px">Ditunjukkan ke buyer untuk disetujui</div>
+ <div class="scrollarea" style="flex:1">${body}</div>
+ <div style="border:1.5px dashed var(--color-text-tertiary);border-radius:10px;padding:8px;font-size:13px;color:var(--color-text-secondary);margin:8px 0">↑ Buyer membaca, lalu menyetujui</div>
+ <button class="btn btnf" style="font-size:18px" onclick="HPgo('estimasi')">Buyer Setuju ✓</button>`
+      );
+    }
+
+    function rEta() {
+      const o = (t) => `<div class="card" style="margin-bottom:10px;${S.eta === t ? "background:var(--color-background-warning)" : ""}" onclick="HPsetEta('${t}')"><span style="font-size:16px">${t}</span></div>`;
+      return (
+        statusbar() +
+        `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><button class="btn" style="width:auto;padding:3px 10px" onclick="HPgo('ringkasan')">←</button><span class="h1">Estimasi</span></div>
+ <div style="font-size:14px;color:var(--color-text-secondary);margin-bottom:14px">Antrian aktif saat ini: 3 helm</div>
+ ${o("Besok, 15:00")}${o("Besok, 17:00")}${o("Lusa, 15:00")}
+ <div style="flex:1"></div>
+ <button class="btn btnf" style="font-size:18px" onclick="HPfinish()">Konfirmasi →</button>`
+      );
+    }
+
+    function rKon() {
+      const items = allTagged();
+      const tags = items.length ? items.map((p) => p.label).join(", ") : "kondisi standar";
+      return (
+        statusbar() +
+        `<div class="h1" style="text-align:center;margin-top:6px">Terkonfirmasi ✓</div>
+ <div style="border:2.5px solid var(--color-text-primary);border-radius:16px 13px 17px 14px;padding:14px;text-align:center;margin:14px 0"><div style="font-size:13px;color:var(--color-text-secondary)">Kode order</div><div style="font-size:30px;font-weight:700;letter-spacing:1px">${S.code}</div></div>
+ <div class="card" style="cursor:default"><div style="font-size:14px;line-height:1.9"><b>${S.name || "Pelanggan"}</b><br>Tipe: ${S.type}<br>Ditandai: ${tags}<br>Ambil: ${S.eta}<br>Harga: Rp ${S.type === "Standar" ? "35.000" : S.type === "Premium" ? "55.000" : "45.000"}</div></div>
+ <div style="flex:1"></div>
+ <button class="btn" style="font-size:16px;margin-bottom:9px" onclick="HPnoop()">Print Nota</button>
+ <button class="btn btnf" style="font-size:17px" onclick="HPhome()">Selesai → Home</button>`
+      );
+    }
+
+    window.HPgo = function (s) {
+      S.screen = s;
+      render();
+    };
+    window.HPnoop = function () {};
+    window.HPstartType = function () {
+      S.screen = "tipe";
+      render();
+    };
+    window.HPpickType = function (t) {
+      S.type = t;
+      S.tagged = new Set();
+      S.view = "F";
+      S.screen = "inspeksi";
+      render();
+    };
+    window.HPsetView = function (v) {
+      S.view = v;
+      render();
+    };
+    window.HPtoggle = function (id) {
+      if (S.tagged.has(id)) S.tagged.delete(id);
+      else S.tagged.add(id);
+      render();
+    };
+    window.HPsetEta = function (t) {
+      S.eta = t;
+      render();
+    };
+    window.HPfinish = function () {
+      if (!S.eta) S.eta = "Besok, 15:00";
+      S.code = "D-0106-00" + (S.orders.length + 1);
+      S.screen = "konfirm";
+      render();
+    };
+    window.HPhome = function () {
+      S.orders.push({ code: S.code, name: S.name || "Pelanggan", type: S.type, status: "Proses", eta: S.eta });
+      S.name = "";
+      S.phone = "";
+      S.type = null;
+      S.tagged = new Set();
+      S.eta = null;
+      S.code = null;
+      S.screen = "home";
+      render();
+    };
+
+    render();
+  })();
+</script>
